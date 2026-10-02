@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Report an Issue - CleanCity</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="site-header" id="site-header"></header>
+
+  <main>
+    <div class="card form-card wide">
+      <h1>Report an issue</h1>
+      <p class="muted">Tell us what is wrong and where. Add a photo so the issue is easier to understand.</p>
+
+      <div id="error" class="alert alert-error" role="alert" hidden></div>
+
+      <form id="report-form" novalidate>
+        <div class="field">
+          <label for="title">Short title</label>
+          <input type="text" id="title" maxlength="80"
+                 placeholder="e.g. Garbage not collected for 3 days" required>
+        </div>
+
+        <div class="field">
+          <label for="category">Category</label>
+          <select id="category" required></select>
+        </div>
+
+        <div class="field">
+          <label for="place">Location</label>
+          <input type="text" id="place" maxlength="100"
+                 placeholder="e.g. Block B, near Gate 2" required>
+        </div>
+
+        <div class="field">
+          <label for="description">Describe the problem</label>
+          <textarea id="description" maxlength="500" required
+                    placeholder="Explain what happened, how long it has been happening, etc."></textarea>
+          <p class="hint">Please give enough detail to help identify the problem.</p>
+        </div>
+
+        <div class="field">
+          <label for="photo">Photo of the issue</label>
+          <input type="file" id="photo" accept="image/*" capture="environment">
+          <p class="hint">On a phone, this can open the camera. You can also choose a photo from your gallery.</p>
+
+          <div id="photo-preview-wrap" class="photo-preview-wrap" hidden>
+            <p class="hint">Photo preview</p>
+            <img id="photo-preview" class="photo-preview" alt="Selected complaint photo">
+            <button type="button" id="remove-photo" class="btn btn-outline btn-sm">Remove photo</button>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-block" type="submit" id="submit-btn">
+          Submit report
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script src="app.js"></script>
+  <script>
+    const user = requireLogin();
+
+    if (user) {
+      const categorySelect = document.getElementById('category');
+      const photoInput = document.getElementById('photo');
+      const previewWrap = document.getElementById('photo-preview-wrap');
+      const preview = document.getElementById('photo-preview');
+      const removePhoto = document.getElementById('remove-photo');
+      const submitBtn = document.getElementById('submit-btn');
+      const errorBox = document.getElementById('error');
+
+      categorySelect.innerHTML =
+        CATEGORIES.map(c => `<option>${esc(c)}</option>`).join('');
+
+      let selectedPhotoData = '';
+
+      function showError(message) {
+        errorBox.textContent = message;
+        errorBox.hidden = false;
+      }
+
+      function clearError() {
+        errorBox.hidden = true;
+        errorBox.textContent = '';
+      }
+
+      // Resize/compress the photo before storing it in localStorage.
+      // This keeps the browser demo from running out of storage too quickly.
+      function preparePhoto(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+
+          reader.onload = function(event) {
+            const image = new Image();
+
+            image.onload = function() {
+              const maxSize = 1280;
+              let width = image.naturalWidth;
+              let height = image.naturalHeight;
+
+              if (width > maxSize || height > maxSize) {
+                const scale = Math.min(maxSize / width, maxSize / height);
+                width = Math.round(width * scale);
+                height = Math.round(height * scale);
+              }
+
+              const canvas = document.createElement('canvas');
+              canvas.width = width;
+              canvas.height = height;
+
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(image, 0, 0, width, height);
+
+              resolve(canvas.toDataURL('image/jpeg', 0.78));
+            };
+
+            image.onerror = () => reject(new Error('Could not read the image.'));
+            image.src = event.target.result;
+          };
+
+          reader.onerror = () => reject(new Error('Could not read the selected file.'));
+          reader.readAsDataURL(file);
+        });
+      }
+
+      photoInput.addEventListener('change', async function() {
+        clearError();
+
+        const file = this.files[0];
+
+        if (!file) {
+          selectedPhotoData = '';
+          previewWrap.hidden = true;
+          return;
+        }
+
+        if (!file.type.startsWith('image/')) {
+          showError('Please select an image file.');
+          photoInput.value = '';
+          return;
+        }
+
+        if (file.size > 12 * 1024 * 1024) {
+          showError('Please choose an image smaller than 12 MB.');
+          photoInput.value = '';
+          return;
+        }
+
+        try {
+          selectedPhotoData = await preparePhoto(file);
+          preview.src = selectedPhotoData;
+          previewWrap.hidden = false;
+        } catch (error) {
+          selectedPhotoData = '';
+          photoInput.value = '';
+          previewWrap.hidden = true;
+          showError('The photo could not be prepared. Please try another image.');
+        }
+      });
+
+      removePhoto.addEventListener('click', function() {
+        selectedPhotoData = '';
+        photoInput.value = '';
+        preview.src = '';
+        previewWrap.hidden = true;
+      });
+
+      document.getElementById('report-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        clearError();
+
+        const data = {
+          title: document.getElementById('title').value,
+          category: categorySelect.value,
+          place: document.getElementById('place').value,
+          description: document.getElementById('description').value,
+          photo: selectedPhotoData
+        };
+
+        if (!data.title.trim() || !data.place.trim() || !data.description.trim()) {
+          showError('Please fill in the title, location and description.');
+          return;
+        }
+
+        try {
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Submitting...';
+
+          const complaint = addComplaint(data, user);
+
+          // created/updated are stored as an ISO timestamp in addComplaint().
+          // My Complaints formats that timestamp using the device's local time.
+          location.href = 'complaints.html?new=' + encodeURIComponent(complaint.id);
+        } catch (error) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Submit report';
+          showError('The complaint could not be saved. If you attached a very large photo, try a smaller photo.');
+        }
+      });
+    }
+  </script>
+</body>
+</html>

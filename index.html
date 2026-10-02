@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CleanCity - Report Local Issues</title>
+  <meta name="description" content="Report garbage, drainage, water and other local problems in your society and track them until they are fixed.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="site-header" id="site-header"></header>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container">
+        <h1>Report local issues. Keep our society clean.</h1>
+        <p>See garbage piling up, a blocked drain or a broken street light? Tell us in a minute and follow the progress on a simple tracker until it is fixed.</p>
+        <div class="hero-actions">
+          <a class="btn btn-light" href="report.html">Report an issue</a>
+          <a class="btn btn-ghost" href="#tips">How to keep it clean</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Overall progress bar -->
+    <section class="container section">
+      <div class="card" id="community-tracker"></div>
+    </section>
+
+    <!-- How it works -->
+    <section class="container section">
+      <h2>How it works</h2>
+      <div class="grid grid-3">
+        <div class="card">
+          <span class="step-num">1</span>
+          <h3>Create an account</h3>
+          <p>Sign up with your name and email. It takes less than a minute.</p>
+        </div>
+        <div class="card">
+          <span class="step-num">2</span>
+          <h3>Report the problem</h3>
+          <p>Choose a category, write where it is and describe what is wrong.</p>
+        </div>
+        <div class="card">
+          <span class="step-num">3</span>
+          <h3>Track the progress</h3>
+          <p>Watch the bar move from <em>Submitted</em> to <em>Resolved</em> as the problem gets fixed.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Latest reports -->
+    <section class="container section">
+      <h2>Latest reports</h2>
+      <p class="section-intro">Recent problems reported by people in the society and how far along they are.</p>
+      <div class="grid grid-3" id="recent"></div>
+    </section>
+
+    <!-- Tips -->
+    <section class="container section" id="tips">
+      <h2>How to keep our society clean</h2>
+      <p class="section-intro">Small habits from every household make a big difference.</p>
+      <div class="grid grid-3">
+        <div class="card tip">
+          <h3>Separate your waste</h3>
+          <p>Keep different bins for wet, dry and recyclable waste so it can be collected and reused properly.</p>
+        </div>
+        <div class="card tip">
+          <h3>Never litter</h3>
+          <p>Carry a small bag with you and use a dustbin. If you do not see one, take the waste home.</p>
+        </div>
+        <div class="card tip">
+          <h3>Keep drains clear</h3>
+          <p>Do not throw plastic, oil or food scraps into drains. Blocked drains cause flooding and mosquitoes.</p>
+        </div>
+        <div class="card tip">
+          <h3>Cut down on plastic</h3>
+          <p>Use a cloth bag and a refillable bottle instead of single-use plastic.</p>
+        </div>
+        <div class="card tip">
+          <h3>Compost kitchen waste</h3>
+          <p>Vegetable peels and leftovers can become compost for plants instead of filling the bin.</p>
+        </div>
+        <div class="card tip">
+          <h3>Join a clean-up drive</h3>
+          <p>Organise a weekend clean-up with your neighbours. And report problems early, before they get worse.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script src="app.js"></script>
+  <script>
+    const all = getComplaints();
+
+    // Overall progress bar
+    document.getElementById('community-tracker').innerHTML = statsHTML(all, 'Community progress');
+
+    // Newest 3 reports
+    const newest = all.slice().sort((a, b) => b.created.localeCompare(a.created)).slice(0, 3);
+    document.getElementById('recent').innerHTML = newest.length
+      ? newest.map(c => complaintCard(c)).join('')
+      : '<p class="muted">No reports yet. Be the first to report an issue!</p>';
+  </script>
+</body>
+</html>

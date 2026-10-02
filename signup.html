@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign up - CleanCity</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="site-header" id="site-header"></header>
+
+  <main>
+    <div class="card form-card">
+      <h1>Create your account</h1>
+      <p class="muted">Sign up to report issues and track them.</p>
+
+      <div id="error" class="alert alert-error" role="alert" hidden></div>
+
+      <form id="signup-form" novalidate>
+        <div class="field">
+          <label for="name">Full name</label>
+          <input type="text" id="name" autocomplete="name" required>
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" autocomplete="email" required>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input type="password" id="password" autocomplete="new-password" minlength="6" required>
+          <p class="hint">At least 6 characters.</p>
+        </div>
+        <div class="field">
+          <label for="confirm">Confirm password</label>
+          <input type="password" id="confirm" autocomplete="new-password" required>
+        </div>
+        <button class="btn btn-primary btn-block" type="submit">Sign up</button>
+      </form>
+
+      <p class="form-foot">Already have an account? <a href="login.html">Log in</a></p>
+    </div>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script src="app.js"></script>
+  <script>
+    const form = document.getElementById('signup-form');
+    const errorBox = document.getElementById('error');
+
+    function showError(message) {
+      errorBox.textContent = message;
+      errorBox.hidden = false;
+    }
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      errorBox.hidden = true;
+
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const confirm = document.getElementById('confirm').value;
+
+      if (!name.trim() || !email.trim()) return showError('Please fill in your name and email.');
+      if (!/^\S+@\S+\.\S+$/.test(email.trim())) return showError('Please enter a valid email address.');
+      if (password.length < 6) return showError('Password must be at least 6 characters.');
+      if (password !== confirm) return showError('The two passwords do not match.');
+
+      const problem = signup(name, email, password);
+      if (problem) return showError(problem);
+
+      location.href = 'complaints.html';
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,393 @@
+/* =========================================================
+   CleanCity styles
+   ========================================================= */
+
+:root {
+  --bg: #f4f7f4;
+  --surface: #ffffff;
+  --text: #1a2b21;
+  --muted: #5a6d61;
+  --border: #dbe4dd;
+  --track: #dde6df;
+
+  --brand: #15803d;          /* buttons */
+  --brand-dark: #116631;
+  --brand-text: #15803d;     /* green text on the page background */
+  --brand-soft: #e5f4ea;
+
+  /* the four complaint stages */
+  --s0: #7c8ea3;  /* Submitted */
+  --s1: #3b82f6;  /* Under Review */
+  --s2: #d97706;  /* In Progress */
+  --s3: #16a34a;  /* Resolved */
+
+  --err-bg: #fdecea;
+  --err-text: #7a1f16;
+  --err-border: #f3bdb7;
+  --danger: #b42318;
+
+  --radius: 14px;
+  --shadow: 0 1px 2px rgba(20, 50, 30, .05);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0e1612;
+    --surface: #16211b;
+    --text: #e7f0ea;
+    --muted: #9db3a5;
+    --border: #25362c;
+    --track: #2d4034;
+    --brand-text: #4ade80;
+    --brand-soft: #173424;
+    --err-bg: #3a1714;
+    --err-text: #fbc9c3;
+    --err-border: #6b2a24;
+    --danger: #f08a80;
+    --shadow: none;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; scroll-padding-top: 76px; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main { flex: 1; }
+
+h1, h2, h3 { line-height: 1.2; margin: 0 0 .5em; }
+h2 { font-size: 1.6rem; }
+h3 { font-size: 1.1rem; }
+p { margin: 0 0 1em; }
+a { color: var(--brand-text); }
+
+.container { width: min(1080px, 100% - 32px); margin-inline: auto; }
+.section { padding: 48px 0 8px; }
+.section-intro { color: var(--muted); max-width: 60ch; margin-bottom: 24px; }
+.muted { color: var(--muted); }
+
+:focus-visible { outline: 3px solid #60a5fa; outline-offset: 2px; }
+
+/* ---------- Header ---------- */
+.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.header-inner { display: flex; align-items: center; gap: 20px; padding: 10px 0; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.2rem; color: var(--text); text-decoration: none; }
+
+.menu { display: flex; align-items: center; flex: 1; gap: 16px; }
+.nav { display: flex; gap: 2px; flex: 1; }
+.nav a { padding: 8px 12px; border-radius: 8px; color: var(--muted); text-decoration: none; font-weight: 600; font-size: .95rem; white-space: nowrap; }
+.nav a:hover { background: var(--brand-soft); color: var(--text); }
+.nav a[aria-current="page"] { color: var(--brand-text); background: var(--brand-soft); }
+.account { display: flex; align-items: center; gap: 8px; }
+.who { font-size: .92rem; color: var(--muted); }
+
+/* the hamburger button is only shown on small screens */
+.menu-btn {
+  display: none; align-items: center; justify-content: center;
+  margin-left: auto; width: 44px; height: 44px;
+  background: none; color: var(--text); cursor: pointer;
+  border: 1px solid var(--border); border-radius: 10px;
+}
+.menu-btn svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
+.menu-btn .icon-close { display: none; }
+.menu-btn[aria-expanded="true"] .icon-open { display: none; }
+.menu-btn[aria-expanded="true"] .icon-close { display: block; }
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 11px 20px; min-height: 44px;
+  border-radius: 10px; border: 1px solid transparent;
+  font: inherit; font-weight: 700; text-decoration: none; cursor: pointer;
+}
+.btn-sm { padding: 6px 14px; min-height: 36px; font-size: .92rem; }
+.btn-primary { background: var(--brand); color: #fff; }
+.btn-primary:hover { background: var(--brand-dark); }
+.btn-outline { background: transparent; border-color: var(--border); color: var(--text); }
+.btn-outline:hover { background: var(--brand-soft); }
+.btn-danger { background: transparent; border-color: var(--danger); color: var(--danger); }
+.btn-danger:hover { background: var(--err-bg); }
+.btn-block { width: 100%; }
+.btn:disabled { opacity: .65; cursor: wait; }
+.link-btn { background: none; border: 0; padding: 0; font: inherit; color: var(--brand-text); text-decoration: underline; cursor: pointer; }
+
+/* ---------- Hero ---------- */
+.hero { background: linear-gradient(135deg, #0d4a2a, #15803d); color: #fff; padding: 64px 0 72px; }
+.hero h1 { font-size: clamp(2rem, 6vw, 3.2rem); line-height: 1.1; margin: 0 0 16px; max-width: 18ch; }
+.hero p { font-size: 1.1rem; max-width: 52ch; margin-bottom: 28px; color: #e3f5ea; }
+.hero .btn-light { background: #fff; color: #0d4a2a; }
+.hero .btn-light:hover { background: #e5f4ea; }
+.hero .btn-ghost { border-color: rgba(255, 255, 255, .6); color: #fff; }
+.hero .btn-ghost:hover { background: rgba(255, 255, 255, .12); }
+.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+/* ---------- Cards and grids ---------- */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); }
+.grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.grid-3 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+
+.step-num {
+  display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 50%;
+  background: var(--brand-soft); color: var(--brand-text); font-weight: 800; margin-bottom: 12px;
+}
+.card p:last-child { margin-bottom: 0; }
+
+/* ---------- Complaint card ---------- */
+.grid > *, .list > * { min-width: 0; }            /* let grid cards shrink instead of stretching the page */
+.complaint { overflow-wrap: anywhere; }           /* very long words / links wrap instead of overflowing */
+.complaint h3 { margin: 12px 0 4px; font-size: 1.15rem; }
+.c-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.chip { background: var(--brand-soft); color: var(--brand-text); padding: 2px 10px; border-radius: 999px; font-size: .78rem; font-weight: 700; }
+.c-id { color: var(--muted); font-size: .82rem; margin-left: 4px; }
+.c-meta { color: var(--muted); font-size: .88rem; margin-bottom: 10px; }
+.c-desc { white-space: pre-line; margin-bottom: 0; }
+.c-updated { margin: 12px 0 0; font-size: .82rem; }
+.c-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+.inline-label { display: flex; align-items: center; gap: 8px; font-size: .9rem; font-weight: 600; margin: 0; }
+.inline-label select { width: auto; padding: 6px 10px; }
+
+/* stage colours: any element with class s0..s3 gets its own colour (--c) */
+.s0 { --c: var(--s0); }
+.s1 { --c: var(--s1); }
+.s2 { --c: var(--s2); }
+.s3 { --c: var(--s3); }
+
+.badge { display: inline-flex; align-items: center; gap: 6px; font-size: .82rem; font-weight: 700; padding: 3px 10px; border: 1px solid var(--border); border-radius: 999px; }
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--c); }
+
+/* ---------- Thin tracker line with round junctions ----------
+   Used twice: .steps = tracker on each complaint, .pipeline = community progress.
+   Each <li> is one quarter of the width. Its ::before draws the line that
+   joins it to the previous junction, and .node is the round junction. */
+.steps, .pipeline {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: repeat(4, 1fr);
+}
+.steps li, .pipeline li {
+  position: relative; display: flex; flex-direction: column; align-items: center; text-align: center;
+}
+.steps li + li::before, .pipeline li + li::before {
+  content: ""; position: absolute; top: 10px; left: -50%; width: 100%; height: 3px;
+  margin-top: -1.5px; background: var(--track);
+}
+.node {
+  position: relative; z-index: 1;   /* z-index keeps the junction above the lines */
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--surface); border: 3px solid var(--track);
+}
+.lbl { margin-top: 8px; font-size: .74rem; line-height: 1.25; color: var(--muted); }
+
+/* complaint tracker */
+.steps { margin-top: 18px; }
+.steps li.reached::before { background: var(--c); }
+.steps li.reached .node { background: var(--c); border-color: var(--c); }
+.steps li.now .node { box-shadow: 0 0 0 4px color-mix(in srgb, var(--c) 25%, transparent); }
+.steps li.now .lbl { color: var(--text); font-weight: 700; }
+.steps li.now:not(.done) .node::after {          /* white dot inside the current junction */
+  content: ""; position: absolute; inset: 3px; border-radius: 50%; background: #fff;
+}
+.steps li.done .node::after {                    /* white tick inside finished junctions */
+  content: ""; position: absolute; left: 50%; top: 46%;
+  width: 4px; height: 8px; border: solid #fff; border-width: 0 2px 2px 0;
+  transform: translate(-50%, -55%) rotate(45deg);
+}
+
+/* community progress */
+.stats-head { display: flex; justify-content: space-between; align-items: baseline; gap: 4px 12px; flex-wrap: wrap; margin-bottom: 20px; }
+.stats-head h3 { margin: 0; }
+.stats-head p { margin: 0; }
+.big { font-size: 1.8rem; color: var(--text); }
+.pipeline .s1 { --p: var(--s0); }
+.pipeline .s2 { --p: var(--s1); }
+.pipeline .s3 { --p: var(--s2); }
+.pipeline li + li::before { background: linear-gradient(90deg, var(--p), var(--c)); }
+.pipeline li.has .node { background: var(--c); border-color: var(--c); }
+.pipeline strong { margin-top: 10px; font-size: 1.3rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.pipeline .lbl { margin-top: 4px; }
+
+/* ---------- Tips section ---------- */
+.tips-band { background: var(--brand-soft); margin-top: 56px; padding: 56px 0 60px; }
+.band-head { text-align: center; max-width: 56ch; margin: 0 auto 32px; }
+.band-head h2 { margin-bottom: 8px; }
+.band-head p { color: var(--muted); margin: 0; }
+.tips-grid { display: grid; gap: 16px; grid-template-columns: repeat(3, 1fr); }
+.tip-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; }
+.tip-icon {
+  display: grid; place-items: center; width: 44px; height: 44px; margin-bottom: 14px;
+  border-radius: 12px; background: var(--brand-soft); color: var(--brand-text);
+}
+.tip-icon svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.tip-card h3 { margin: 0 0 6px; }
+.tip-card p { margin: 0; color: var(--muted); font-size: .95rem; }
+.band-cta { text-align: center; margin: 32px 0 0; }
+
+/* ---------- Forms ---------- */
+.form-card { width: min(480px, 100% - 32px); margin: 40px auto; }
+.form-card.wide { width: min(640px, 100% - 32px); }
+.field { margin-bottom: 16px; }
+label { display: block; font-weight: 600; font-size: .92rem; margin-bottom: 6px; }
+input, select, textarea {
+  width: 100%; padding: 11px 12px; font: inherit; color: var(--text);
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+}
+textarea { min-height: 120px; resize: vertical; }
+.hint { font-size: .85rem; color: var(--muted); margin: 6px 0 0; }
+.alert { padding: 12px 14px; border-radius: 10px; margin-bottom: 16px; font-size: .95rem; }
+.alert-error { background: var(--err-bg); color: var(--err-text); border: 1px solid var(--err-border); }
+.alert-ok { background: var(--brand-soft); color: var(--brand-text); border: 1px solid var(--border); font-weight: 600; }
+.demo-box { background: var(--brand-soft); border-radius: 10px; padding: 12px 14px; font-size: .88rem; margin-top: 20px; }
+.demo-box p { margin: 0 0 4px; }
+.form-foot { text-align: center; margin: 18px 0 0; }
+
+
+
+/* ---------- Complaint details and photos ---------- */
+.c-details {
+  margin: 10px 0 14px;
+  padding: 12px 14px;
+  background: var(--bg);
+  border-radius: 10px;
+}
+.c-details .c-meta { margin: 0 0 5px; }
+.c-details .c-meta:last-child { margin-bottom: 0; }
+
+.c-description {
+  margin: 0 0 14px;
+}
+.c-description > strong,
+.c-photo-title > strong {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.c-photo-wrap {
+  margin: 16px 0;
+}
+.c-photo-title {
+  margin: 0 0 8px;
+}
+.c-photo {
+  display: block;
+  width: min(100%, 560px);
+  max-height: 420px;
+  object-fit: contain;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+}
+.c-no-photo {
+  color: var(--muted);
+  font-size: .85rem;
+  margin: 12px 0;
+}
+
+.photo-preview-wrap {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+}
+.photo-preview {
+  display: block;
+  width: min(100%, 420px);
+  max-height: 320px;
+  object-fit: contain;
+  border-radius: 10px;
+  margin: 8px 0 12px;
+}
+
+/* ---------- Complaints page ---------- */
+.page-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin: 36px 0 20px; }
+.page-head h1 { margin: 0; font-size: 1.8rem; }
+.page-head select { width: auto; }
+.list { display: grid; gap: 16px; margin-bottom: 48px; }
+.empty { text-align: center; padding: 40px 20px; }
+
+/* ---------- Footer ---------- */
+.site-footer { border-top: 1px solid var(--border); background: var(--surface); }
+.footer-inner { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 20px 0; font-size: .9rem; color: var(--muted); }
+.footer-inner p { margin: 0; }
+
+
+/* =========================================================
+   Responsive
+   ========================================================= */
+
+/* Tablets and phones: the menu becomes a hamburger dropdown */
+@media (max-width: 860px) {
+  .header-inner { flex-wrap: wrap; gap: 0 12px; padding: 8px 0; }
+  .menu-btn { display: inline-flex; }
+
+  .menu {
+    display: none; flex: 0 0 100%; flex-direction: column; align-items: stretch;
+    gap: 12px; padding: 8px 0 16px;
+    max-height: calc(100vh - 70px); overflow-y: auto;
+  }
+  .menu.open { display: flex; }
+
+  .nav { flex: none; flex-direction: column; }
+  .nav a { display: flex; align-items: center; min-height: 44px; padding: 10px 14px; font-size: 1rem; }
+
+  .account { flex-wrap: wrap; padding-top: 14px; border-top: 1px solid var(--border); }
+  .who { flex: 0 0 100%; }
+  .account .btn { flex: 1; min-height: 44px; }
+
+  .tips-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+  h2 { font-size: 1.4rem; }
+  .section { padding-top: 36px; }
+  .card { padding: 16px; }
+
+  .hero { padding: 40px 0 44px; }
+  .hero h1 { max-width: none; }
+  .hero p { font-size: 1rem; }
+  .hero-actions .btn { flex: 1 1 100%; }
+
+  .grid, .grid-3 { grid-template-columns: 1fr; }
+
+  /* tips: compact rows with the icon on the left */
+  .tips-band { margin-top: 40px; padding: 40px 0 44px; }
+  .tips-grid { grid-template-columns: 1fr; gap: 12px; }
+  .tip-card { display: flex; gap: 14px; padding: 16px; }
+  .tip-icon { flex: none; margin: 0; }
+  .band-cta .btn { width: 100%; }
+
+  .form-card, .form-card.wide { margin: 20px auto 32px; }
+
+  .page-head { margin: 24px 0 16px; }
+  .page-head h1 { font-size: 1.5rem; }
+  .page-head > div:last-child { width: 100%; }
+  .page-head select { width: 100%; }
+
+  .c-actions { flex-direction: column; align-items: stretch; }
+  .inline-label { justify-content: space-between; }
+  .inline-label select { flex: 1; min-height: 44px; }
+  .c-actions .btn { width: 100%; min-height: 44px; }
+  .empty { padding: 28px 16px; }
+
+  .footer-inner { flex-direction: column; align-items: flex-start; }
+}
+
+@media (max-width: 380px) {
+  .lbl { font-size: .68rem; }
+  .big { font-size: 1.5rem; }
+}

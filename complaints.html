@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Complaints - CleanCity</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="site-header" id="site-header"></header>
+
+  <main class="container">
+    <div class="page-head">
+      <div>
+        <h1 id="page-title">My Complaints</h1>
+        <p class="muted" id="page-sub"></p>
+      </div>
+      <div>
+        <label for="filter">Show</label>
+        <select id="filter">
+          <option value="all">All statuses</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="notice" class="alert alert-ok" role="status" hidden></div>
+
+    <div class="card" id="summary" style="margin-bottom:16px"></div>
+    <div class="list" id="list"></div>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script src="app.js"></script>
+  <script>
+    const user = requireLogin(); // sends to login page if not logged in
+
+    function startPage() {
+      const isAdmin = user.role === 'admin';
+      const list = document.getElementById('list');
+      const filter = document.getElementById('filter');
+
+      // Page texts depend on who is logged in
+      document.getElementById('page-title').textContent = isAdmin ? 'All Complaints' : 'My Complaints';
+      document.getElementById('page-sub').textContent = isAdmin
+        ? 'Admin view: change the status to move a complaint along the tracker.'
+        : 'Follow each report on its tracker bar.';
+      document.title = (isAdmin ? 'All Complaints' : 'My Complaints') + ' - CleanCity';
+
+      // Fill the status filter
+      STAGES.forEach((name, i) => filter.insertAdjacentHTML('beforeend', `<option value="${i}">${name}</option>`));
+
+      // "Your complaint was submitted" message (comes from report.html)
+      const newId = new URLSearchParams(location.search).get('new');
+      if (/^CC-\d+$/.test(newId || '')) {
+        const notice = document.getElementById('notice');
+        notice.textContent = `Thank you! Your report ${newId} has been submitted.`;
+        notice.hidden = false;
+      }
+
+      function render() {
+        // Admin sees everything, a resident sees only their own reports
+        const mine = getComplaints()
+          .filter(c => isAdmin || c.email === user.email)
+          .sort((a, b) => b.created.localeCompare(a.created));
+
+        document.getElementById('summary').innerHTML = statsHTML(mine, isAdmin ? 'All reports' : 'Your reports');
+
+        const shown = filter.value === 'all' ? mine : mine.filter(c => c.stage === Number(filter.value));
+
+        if (!shown.length) {
+          list.innerHTML = `<div class="card empty">
+              <p>${mine.length ? 'No complaints with this status.' : 'You have not reported anything yet.'}</p>
+              <a class="btn btn-primary" href="report.html">Report an issue</a>
+            </div>`;
+          return;
+        }
+        list.innerHTML = shown.map(c => complaintCard(c, { user, manage: true })).join('');
+      }
+
+      filter.addEventListener('change', render);
+
+      // Admin changes status
+      list.addEventListener('change', function (event) {
+        if (event.target.dataset.action === 'status') {
+          setStage(event.target.dataset.id, Number(event.target.value));
+          render();
+        }
+      });
+
+      // Delete / withdraw
+      list.addEventListener('click', function (event) {
+        const button = event.target.closest('[data-action="delete"]');
+        if (button && confirm('Remove this complaint?')) {
+          deleteComplaint(button.dataset.id);
+          render();
+        }
+      });
+
+      render();
+    }
+
+    if (user) startPage();
+  </script>
+</body>
+</html>
